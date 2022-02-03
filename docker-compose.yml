@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+  main:
+    container_name: "Manager"
+    build: "./Main"
+    expose: ["3000"]
+    ports: ["5000:5000"]
+
+  fortnite:
+    container_name: "Fortnite"
+    build: "./Fortnite"
+    depends_on: ["main"]
