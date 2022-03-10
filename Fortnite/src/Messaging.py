@@ -1,4 +1,4 @@
-# Fortnite Container Entry Point
+# Fortnite Messaging Class
 # Copyright (C) 2022  andre4ik3
 #
 # This program is free software: you can redistribute it and/or modify
@@ -14,11 +14,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from Client import AerialClient
+import zmq
 
-context = zmq.Context()
-socket = context.socket(zmq.PULL)
-
-# Connect to socket
-socket.connect("tcp://main:3000")
-print("Connected to ZeroMQ socket")
+print("pushin p")

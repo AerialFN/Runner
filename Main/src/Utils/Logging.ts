@@ -1,4 +1,4 @@
-// Main Entry Point
+// Logging Manager
 // Copyright (C) 2022  andre4ik3
 //
 // This program is free software: you can redistribute it and/or modify
@@ -14,16 +14,22 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import zero from "zeromq";
-import amqp from "amqplib";
+import Winston from "winston";
 
-const socket = zero.socket("push");
-
-socket.bind("tcp://0.0.0.0:3000", (error) => {
-  if (error) {
-    console.log(`Error whilst binding to socket: ${error}`);
-    process.exit(1);
-  } else {
-    console.log("ZeroMQ socket listening on port 3000");
-  }
+export const log = Winston.createLogger({
+  level: "silly",
+  transports: [
+    new Winston.transports.Console({
+      format: Winston.format.cli(),
+    }),
+    new Winston.transports.File({
+      filename: "controlplane.log",
+      format: Winston.format.timestamp(),
+    }),
+  ],
+  exitOnError: false,
+  handleExceptions: true,
+  handleRejections: true,
 });
+
+process.on("uncaughtException", (e) => log.error(e.message));

@@ -9,6 +9,7 @@ start = "python3 -m src"
 [packages]
 fortnitepy = "*"
 pyzmq = "*"
+mypy = "*"
 
 [dev-packages]
 
