@@ -1,0 +1,188 @@
+name: "CI"
+on: "push"
+
+jobs:
+  init:
+    name: "Initialization"
+    runs-on: "ubuntu-latest"
+
+    outputs:
+      skip: ${{ steps.checkskip.outputs.ci-skip }}
+      # typescript: ${{ steps.files.outputs.ts }}
+      # python: ${{ steps.files.outputs.py }}
+
+    steps:
+      - name: "Checkout Repository"
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: "Check CI Skip Status"
+        id: "checkskip"
+        uses: mstachniuk/ci-skip@master
+
+      # - name: "Check File Changes"
+      #   id: "files"
+      #   uses: @tj-actions/check-files@v17
+      #   outputs:
+
+      #     # Checking for typescript changes
+      #     tsadded: ${{ contains(outputs.added_files, ".ts") }}
+      #     tschanged: ${{ contains(outputs.modified_files, ".ts") }}
+      #     ts: ${{ outputs.tsadded || outputs.tschanged }}
+
+      #     # Checking for python changes
+      #     pyadded: ${{ contains(outputs.added_files, ".py") }}
+      #     pychanged: ${{ contains(outputs.modified_files, ".py") }}
+      #     py: ${{ outputs.pyadded || outputs.pychanged }}
+
+
+
+################################################################################
+# PYTHON                                                                       #
+################################################################################
+
+  lint-python:
+    name: "Lint Python Code"
+    runs-on: ubuntu-latest
+    needs: init
+    # if: needs.init.outputs.python
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+
+      - name: "Setup NodeJS"
+        uses: actions/setup-node@v2
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1.1.0
+
+      - name: Install Flake8 & Pyright
+        run: |
+          cd Fortnite
+          python -m pip install -U pip wheel
+          python -m pip install -U flake8 pipenv
+          pipenv install
+          sudo npm i -g pyright
+
+      - name: Lint Code
+        run: |
+          echo "::group::Flake8 - Python 3.9"
+
+          flake8 . --exit-zero --count --select=E9,F63,F7,F82 --format='::error file=%(path)s,line=%(row)d,col=%(col)d,::%(text)s' --statistics
+
+          flake8 . --exit-zero --count --max-complexity=10 --max-line-length=127 --format='::warning file=%(path)s,line=%(row)d,col=%(col)d,::%(text)s' --statistics
+
+          echo "::endgroup::"
+
+          sh -c "npx pyright --outputjson Fortnite/src > /tmp/pyright.json; exit 0"
+          deno run --allow-read .github/workflows/pyformat.ts
+
+          exit 0
+
+  format-python:
+    name: Black Format
+    needs: [init, lint-python]
+    runs-on: ubuntu-latest
+    permissions: { contents: write }
+    # if: !needs.init.outputs.ci-skip && needs.init.outputs.python
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+
+      - name: Install Black
+        run: |
+          python -m pip install -U pip wheel
+          python -m pip install -U black
+
+      - name: Check Format
+        run: /bin/bash -c 'black --check .; echo "should_format=$?" >>  $GITHUB_ENV; exit 0'
+
+      - name: Reformat Code
+        if: env.should_format == 1
+        run: black .
+
+      - name: Commit New Code
+        if: env.should_format == 1
+        run: |
+          git config --global user.name 'blackbot'
+          git config --global user.email 'andre4ik3@users.noreply.github.com'
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
+          git stash
+          git pull
+          git stash pop
+          git commit -am "[ci-skip] Reformat Code with Black"
+          git push origin HEAD:$GITHUB_REF
+
+  
+
+################################################################################
+# TYPESCRIPT                                                                   #
+################################################################################
+
+  lint-typescript:
+    name: "Lint TypeScript Code"
+    runs-on: ubuntu-latest
+    needs: init
+    # if: needs.init.outputs.typescript
+
+    steps:
+      - name: "Checkout Repository"
+        uses: actions/checkout@v2
+
+      - name: "Setup NodeJS"
+        uses: actions/setup-node@v2
+
+      - name: "Install Dependencies"
+        run: "cd Main && npm ci"
+
+      - name: "Lint Code"
+        run: "cd Main && npm run lint"
+
+  build-typescript:
+    name: "Build TypeScript Code"
+    runs-on: ubuntu-latest
+    needs: init
+    # if: needs.init.outputs.typescript
+
+    steps:
+      - name: "Checkout Repository"
+        uses: actions/checkout@v2
+
+      - name: "Setup NodeJS"
+        uses: actions/setup-node@v2
+
+      - name: "Install Dependencies"
+        run: "cd Main && npm ci"
+
+      - name: "Compile"
+        run: "cd Main && npm run build"
+
+
+
+################################################################################
+# DOCKER                                                                       #
+################################################################################
+
+  build-container:
+    name: "Build Container"
+    runs-on: ubuntu-latest
+    needs: [lint-python, format-python, lint-typescript, build-typescript]
+
+    steps:
+      - name: "Checkout Repository"
+        uses: actions/checkout@v2
+
+      - name: "Build Container"
+        run: docker compose build
