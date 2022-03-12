@@ -112,20 +112,20 @@ jobs:
         if: env.should_format == 1
         run: black .
 
-      - name: Commit New Code
-        if: env.should_format == 1
-        env: { TOKEN: "${{ secrets.BOT_TOKEN }}" }
-        run: |
-          git config --global user.name 'github-actions'
-          git config --global user.email 'actions@github.com'
-          git remote set-url origin https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}
-          git stash
-          git pull
-          git stash pop
-          git commit -am "[ci-skip] Reformat Code with Black"
-          git push origin HEAD:$GITHUB_REF
+      # - name: Commit New Code
+      #   if: env.should_format == 1
+      #   env: { TOKEN: "${{ secrets.BOT_TOKEN }}" }
+      #   run: |
+      #     git config --global user.name 'github-actions'
+      #     git config --global user.email 'actions@github.com'
+      #     git remote set-url origin https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}
+      #     git stash
+      #     git pull
+      #     git stash pop
+      #     git commit -am "[ci-skip] Reformat Code with Black"
+      #     git push origin HEAD:$GITHUB_REF
 
-  
+
 
 ################################################################################
 # TYPESCRIPT                                                                   #
