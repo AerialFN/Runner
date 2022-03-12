@@ -14,6 +14,13 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#system imports
+import asyncio
+import json
+
+
+#3rd party imports
+import fortnitepy
 from Client import AerialClient
 
 context = zmq.Context()
@@ -22,3 +29,31 @@ socket = context.socket(zmq.PULL)
 # Connect to socket
 socket.connect("tcp://main:3000")
 print("Connected to ZeroMQ socket")
+
+clients = {
+    # example
+    "bruh-moment-some-random-id": [ "client1" "Client2", "Client3" ]
+}
+
+async def receive():
+    while True:
+        msg = json.loads(socket.recv())
+        print(f"received:\n{msg}")
+        if msg['action'] == 0:
+            channel = msg['data']['channelId']
+            client = AerialClient(
+            auth=fortnitepy.DeviceAuth(
+                device_id=msg['auths']['deviceId'],
+                account_id=msg['auths']['clientId'],
+                secret=msg['auths']['secret'],
+              )
+           )
+          try:
+            await client.login()
+            if clients[channel] == None:
+                clients[channel] = [] 
+            clients[channel].append(client)
+          except:
+            pass 
+
+asyncio.run(receive())
