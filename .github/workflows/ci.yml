@@ -88,7 +88,6 @@ jobs:
     name: Black Format
     needs: [init, lint-python]
     runs-on: ubuntu-latest
-    permissions: { contents: write }
     # if: !needs.init.outputs.ci-skip && needs.init.outputs.python
 
     steps:
@@ -118,7 +117,7 @@ jobs:
         run: |
           git config --global user.name 'blackbot'
           git config --global user.email 'andre4ik3@users.noreply.github.com'
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
+          git remote set-url origin https://x-access-token:${{ secrets.BOT_TOKEN }}@github.com/$GITHUB_REPOSITORY
           git stash
           git pull
           git stash pop

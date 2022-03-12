@@ -16,6 +16,7 @@
 
 from fortnitepy import Client, AdvancedAuth
 
+
 class AerialClient(Client):
     def __init__(self, auth: AdvancedAuth) -> None:
         super().__init__(auth)
