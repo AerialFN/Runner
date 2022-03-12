@@ -10,4 +10,4 @@ RUN ["npm", "run", "build"]
 EXPOSE 5000
 EXPOSE 3000
 
-ENTRYPOINT ["npm", "run", "start"]
+ENTRYPOINT ["npm", "start"]

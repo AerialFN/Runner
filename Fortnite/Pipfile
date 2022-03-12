@@ -10,6 +10,7 @@ start = "python3 -m src"
 fortnitepy = "*"
 pyzmq = "*"
 mypy = "*"
+uvloop = "*"
 
 [dev-packages]
 

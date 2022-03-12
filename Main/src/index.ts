@@ -27,3 +27,6 @@ socket.bind("tcp://0.0.0.0:3000", (error) => {
     console.log("ZeroMQ socket listening on port 3000");
   }
 });
+
+socket.on("message", m => console.log);
+setTimeout(() => socket.send(`{ "hello": "world" }`), 10000);

@@ -1,4 +1,4 @@
-# Fortnite Client Class
+# Fortnite Client
 # Copyright (C) 2022  andre4ik3
 #
 # This program is free software: you can redistribute it and/or modify
@@ -14,9 +14,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import fortnitepy
+from fortnitepy import Client, AdvancedAuth
 
-
-class AerialClient(fortnitepy.Client):
-    def __init__(self, auth):
-        super().__init__(auth=auth)
+class AerialClient(Client):
+    def __init__(self, auth: AdvancedAuth) -> None:
+        super().__init__(auth)

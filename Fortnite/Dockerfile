@@ -1,9 +1,9 @@
-FROM python
+FROM python:slim
 WORKDIR /home/app
-RUN ["pip3", "install", "pipenv"]
+RUN ["/usr/local/bin/pip3", "install", "pipenv"]
 
 COPY Pipfile Pipfile.lock ./
-RUN ["pipenv", "sync"]
+RUN ["/usr/local/bin/pipenv", "install", "--system", "--deploy"]
 
 COPY . .
-ENTRYPOINT ["pipenv", "run", "start"]
+ENTRYPOINT ["python3", "-m", "src"]
