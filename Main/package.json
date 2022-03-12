@@ -1,7 +1,8 @@
 {
   "scripts": {
     "build": "tsc",
-    "start": "node dist"
+    "start": "node dist",
+    "lint": "npx eslint -f ../.github/workflows/formatter.js src/**/*.ts; exit 0"
   },
   "devDependencies": {
     "@tsconfig/recommended": "^1.0.1",

@@ -8,7 +8,7 @@ module.exports = function (results) {
   results.forEach((result) => {
     if (!("messages" in result)) return;
 
-    const filePath = `file=${relative(cwd, result.filePath)}`;
+    const filePath = `file=Main/${relative(cwd, result.filePath)}`;
 
     result.messages.forEach((m) => {
       const severity = m.severity === 2 ? "error" : "warning";
