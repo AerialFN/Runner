@@ -88,6 +88,7 @@ jobs:
     name: Black Format
     needs: [init, lint-python]
     runs-on: ubuntu-latest
+    permissions: { contents: write }
     # if: !needs.init.outputs.ci-skip && needs.init.outputs.python
 
     steps:
