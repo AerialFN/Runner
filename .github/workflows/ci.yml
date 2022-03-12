@@ -135,7 +135,7 @@ jobs:
         run: "cd Main && npm ci"
 
       - name: "Lint Code"
-        run: "npx eslint -f .github/workflows/formatter.js Main/src/**/*.ts"
+        run: "cd Main && npx eslint -f ../.github/workflows/formatter.js src/**/*.ts"
 
   build-typescript:
     name: "Build TypeScript Code"
