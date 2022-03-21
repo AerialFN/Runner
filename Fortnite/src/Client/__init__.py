@@ -14,9 +14,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from fortnitepy import Client, AdvancedAuth
+from fortnitepy import Client
+from fortnitepy import DeviceAuth
 
 
 class AerialClient(Client):
-    def __init__(self, auth: AdvancedAuth) -> None:
+    def __init__(self, auth: DeviceAuth) -> None:
         super().__init__(auth)
